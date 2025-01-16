@@ -18,9 +18,7 @@
 - **메모 드래그** : 메모를 위 아래로 움직여 원하는 자리에 배치할 수 있음.
 
 ## preview
-
-### 메모 목록 화면
-![메모 목록 화면](https://example.com/image1.jpg)
-
-### 메모 작성 화면
-![메모 작성 화면](https://example.com/image2.jpg)
+<div style="display: flex; justify-content: space-between; margin-right: 10px;">
+  <img src="image/main.png" width="32%" />
+  <img src="image/content.png" width="32%" />
+</div>
