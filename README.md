@@ -14,11 +14,11 @@
 - **메모 추가** : 새로운 제목과 내용을 입력하여 메모를 추가할 수 있음.
 - **메모 수정** : 기존의 메모를 선택하여 제목과 내용을 수정할 수 있음.
 - **메모 삭제** : 메모를 삭제할 수 있음.
-- **메모 목록 보기** : 모든 메모를 목록 형식으로 볼 수 있음.
 - **메모 드래그** : 메모를 위 아래로 움직여 원하는 자리에 배치할 수 있음.
+- **메모 저장** : 변경 내용을 자동으로 저장함.
 
 ## preview
-<div style="display: flex; justify-content: space-between; margin-right: 10px;">
-  <img src="image/main.png" width="32%" />
-  <img src="image/content.png" width="32%" />
+<div style="display: flex; justify-content: center;">
+  <img src="image/main.png" width="36%"" />
+  <img src="image/content.png" width="36%" />
 </div>
