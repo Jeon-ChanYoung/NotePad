@@ -8,6 +8,7 @@
 
 - **Android Studio**: Ladybug | 2024.2.1 Patch 3
 - **Gradle**: 8.9
+- **kotlin**: 1.9.24
 <br>
 
 ## 모바일에서 실행 방법
@@ -35,5 +36,5 @@
 <br>
 
 ## 참고사항
-- recyclerView로 구현
+- recyclerView로 메모 목록 구현
 - sharedPreference를 이용해 저장 및 불러오기
