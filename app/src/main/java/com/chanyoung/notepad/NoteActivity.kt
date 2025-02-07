@@ -7,16 +7,23 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowInsetsController
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var titleEditText: EditText
     private lateinit var memoEditText: EditText
+    private lateinit var titleEditTextOriginal: String
+    private lateinit var memoEditTextOriginal: String
 
     private lateinit var title: String
     private lateinit var content: String
     private lateinit var itemId: String
+
+    private var isSavedMemo = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,12 +59,14 @@ class NoteActivity : AppCompatActivity() {
         title = intent.getStringExtra("title") ?: ""
         content = intent.getStringExtra("content") ?: ""
         itemId = intent.getStringExtra("itemId") ?: ""
-
     }
 
     private fun setInitialData() {
         titleEditText.setText(title)
         memoEditText.setText(content)
+        titleEditTextOriginal = title
+        memoEditTextOriginal = content
+
         memoEditText.requestFocus()
         memoEditText.post { memoEditText.scrollTo(0, 0) }
     }
@@ -66,7 +75,7 @@ class NoteActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                saveNote() // 메모 저장
+                saveNoteToPrefs() // 메모 저장
                 finish() // 현재 액티비티 종료
                 overridePendingTransition(0, 0) // 화면 전환시 애니매이션 제거
                 true
@@ -77,22 +86,61 @@ class NoteActivity : AppCompatActivity() {
 
     // 소프트키 뒤로가기(홈키 옆에 있는) 버튼 동작 설정
     override fun onBackPressed() {
-        saveNote() // 메모 저장
+        saveNoteToPrefs() // 메모 저장
         super.onBackPressed() // 기본 뒤로가기 동작 실행
         overridePendingTransition(0, 0) // 화면 전환시 애니매이션 제거
     }
 
-    private fun saveNote() {
+    // 홈키 버튼 동작 설정
+    override fun onPause() {
+        saveNoteToPrefs() // 메모 저장
+        super.onPause()
+    }
+
+    private fun saveNoteToPrefs() {
+        if (isSavedMemo) {
+            return
+        }
+        isSavedMemo = true
+
         val title = titleEditText.text.toString()
         val content = memoEditText.text.toString()
 
         Log.d("test", "Saving Note - Title: $title, Content: $content, itemId: $itemId")
 
-        // 이전 화면으로 데이터 전달
-        val intent = intent
-        intent.putExtra("title", title)
-        intent.putExtra("content", content)
-        intent.putExtra("itemId", itemId)
-        setResult(RESULT_OK, intent)
+        // 변경사항 없으면 패스
+        if (title == titleEditTextOriginal && content == memoEditTextOriginal) {
+            setResult(RESULT_CANCELED)
+            finish()
+            return
+        }
+
+        // Toast 메시지 띄우기
+        Toast.makeText(this, "메모가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+        val sharedPreferences = getSharedPreferences(MainActivity.SHARED_PREFS_NAME, MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // 기존 데이터 불러오기
+        val json = sharedPreferences.getString(MainActivity.UNIQUE_ID_KEY, "{}") ?: "{}"
+        val typeToken = object : TypeToken<MutableMap<String, Pair<String, String>>>() {}.type
+        val currentData: MutableMap<String, Pair<String, String>> =
+            Gson().fromJson(json, typeToken) ?: mutableMapOf()
+
+        // 현재 메모 데이터를 저장
+        currentData[itemId] = Pair(titleEditText.text.toString(), memoEditText.text.toString())
+
+        // JSON 변환 후 저장
+        val updatedJson = Gson().toJson(currentData)
+        editor.putString("uniqueId", updatedJson)
+        editor.apply()
+
+        // 결과 설정
+        intent.apply {
+            putExtra("title", title)
+            putExtra("content", content)
+            putExtra("itemId", itemId)
+            setResult(RESULT_OK, this)
+        }
     }
 }

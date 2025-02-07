@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val SHARED_PREFS_NAME = "NotePadPrefs"
-        private const val UNIQUE_ID_KEY = "uniqueId"
+        const val SHARED_PREFS_NAME = "NotePadPrefs"
+        const val UNIQUE_ID_KEY = "uniqueId"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
