@@ -3,16 +3,23 @@ package com.chanyoung.notepad
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.UUID
@@ -24,7 +31,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var customAdapter: CustomAdapter
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var button: Button
+    private lateinit var addButton: ImageButton
+
+    private lateinit var adView: AdView
+    private lateinit var constraintLayout: ConstraintLayout
+    private lateinit var constraintSet: ConstraintSet
 
     private val itemTouchHelper by lazy {
         ItemTouchHelper(itemTouchCallback)
@@ -53,6 +64,9 @@ class MainActivity : AppCompatActivity() {
 
         // + 버튼 설정
         setupAddMemoButton()
+
+        // 광고 초기화
+        initializeAdMob()
     }
 
     // activity_main 초기 UI 설정
@@ -66,9 +80,33 @@ class MainActivity : AppCompatActivity() {
         windowInsetsController.isAppearanceLightStatusBars = false // 상태바 위젯 색상 하얀색으로 설정
     }
 
+    private fun initializeAdMob() {
+        adView = findViewById(R.id.adView)
+        addButton = findViewById(R.id.addButton)
+        constraintLayout = findViewById(R.id.main)
+        constraintSet = ConstraintSet()
+
+        // 화면 로딩 후에 광고를 로드
+        adView.post {
+            MobileAds.initialize(this) {}
+            val adRequest = AdRequest.Builder().build()
+            adView.loadAd(adRequest)
+
+            // 광고가 로드된 후 addButton 위치 변경
+            adView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    constraintSet.clone(constraintLayout)
+                    constraintSet.connect(R.id.addButton, ConstraintSet.BOTTOM, R.id.adView, ConstraintSet.TOP)
+                    constraintSet.applyTo(constraintLayout)
+                }
+            }
+        }
+    }
+
     private fun initializeViews() {
         recyclerView  = findViewById(R.id.recyclerView)
-        button = findViewById(R.id.button)
+        addButton = findViewById(R.id.addButton)
     }
 
     private fun loadMemoData() {
@@ -99,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupAddMemoButton() {
-        button.setOnClickListener {
+        addButton.setOnClickListener {
             // 초기값 설정 밑 저장
             val newTitle = "제목없음"
             val newMemo = ""
@@ -232,12 +270,47 @@ class MainActivity : AppCompatActivity() {
             memoItemId.add(toPosition, itemId)
 
             saveAllData()
+
             customAdapter.notifyItemMoved(fromPosition, toPosition)
             return true
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+        // 드래그 중일 땐 아이템 뷰 비활성화
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            viewHolder.itemView.findViewById<TextView>(R.id.titleTextView)?.isEnabled = false
+            viewHolder.itemView.findViewById<ImageButton>(R.id.deleteButton)?.isEnabled = false
+            viewHolder.itemView.findViewById<ImageButton>(R.id.dragButton)?.isEnabled = false
+        }
+
+        // 드래그 시작 시 아이템 뷰 활성화
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+
+            if (viewHolder != null) {
+                viewHolder.itemView.findViewById<TextView>(R.id.titleTextView)?.isEnabled = true
+                viewHolder.itemView.findViewById<ImageButton>(R.id.deleteButton)?.isEnabled = true
+                viewHolder.itemView.findViewById<ImageButton>(R.id.dragButton)?.isEnabled = true
+            }
+        }
+
         override fun isLongPressDragEnabled(): Boolean = false
         override fun isItemViewSwipeEnabled(): Boolean = false
+    }
+
+
+    // Activity 종료 시 광고 리소스 해제
+    override fun onPause() {
+        super.onPause()
+        adView.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adView.resume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adView.destroy()
     }
 }

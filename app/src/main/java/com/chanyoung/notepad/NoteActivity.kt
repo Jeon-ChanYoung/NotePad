@@ -10,6 +10,9 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -23,6 +26,8 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var content: String
     private lateinit var itemId: String
 
+    private lateinit var adView: AdView
+
     private var isSavedMemo = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +35,7 @@ class NoteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_note)
 
         setupUI() // 초기 UI 설정
+        initializeAdMob() // 하단 광고 배너 설정
         initializeViews() // 제목EditText, 메모EditText 찾기
         loadIntentData() // 이전 화면에서 전달받은 데이터 로드
         setInitialData() // 이전 화면에서 전달받은 데이터로 제목EditText, 메모EditText 초기화
@@ -47,6 +53,17 @@ class NoteActivity : AppCompatActivity() {
             )
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        }
+    }
+
+    private fun initializeAdMob() {
+        adView = findViewById(R.id.adView)
+
+        // 화면 로딩 후에 광고를 로드
+        adView.post {
+            MobileAds.initialize(this) {}
+            val adRequest = AdRequest.Builder().build()
+            adView.loadAd(adRequest)
         }
     }
 
@@ -94,7 +111,18 @@ class NoteActivity : AppCompatActivity() {
     // 홈키 버튼 동작 설정
     override fun onPause() {
         saveNoteToPrefs() // 메모 저장
+        adView.pause()
         super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adView.resume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adView.destroy()
     }
 
     private fun saveNoteToPrefs() {

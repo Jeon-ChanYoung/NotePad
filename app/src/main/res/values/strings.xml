@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">NotePad</string>
+    <string name="admob_app_id">ca-app-pub-6898099128056135~1472241647</string>
+    <string name="admob_banner_id">ca-app-pub-6898099128056135/1504031237</string>
+<!--    <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>-->
+<!--    테스트 광고 아이디-->
 
 </resources>
