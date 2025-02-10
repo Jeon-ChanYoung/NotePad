@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
+    android:padding="12dp"
     android:descendantFocusability="blocksDescendants"
     android:background="@android:color/white">
 
@@ -24,22 +24,21 @@
     <!-- 삭제 버튼 -->
     <ImageButton
         android:id="@+id/deleteButton"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="@null"
-        android:contentDescription="delete"
+        android:contentDescription="메모 삭제"
         android:scaleType="fitCenter"
-        android:src="@drawable/trash_bin_gray_icon"/>
+        android:src="@drawable/trash_bin"/>
 
     <!-- 드래그 버튼 -->
     <ImageButton
         android:id="@+id/dragButton"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="10dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="@null"
-        android:contentDescription="drag"
+        android:contentDescription="메모 이동"
         android:scaleType="fitCenter"
-        android:src="@drawable/drag_gray_item_icon"/>
+        android:src="@drawable/drag"/>
 
 </LinearLayout>

@@ -65,7 +65,13 @@ class CustomAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.titleTextView.text = titles[position]
+        val title = titles[position]
+        holder.titleTextView.text = title
+
+        // 각 항목에 대한 고유한 contentDescription 설정
+        holder.titleTextView.contentDescription = "메모 항목 ${position + 1}"
+        holder.deleteButton.contentDescription = "삭제 버튼 ${position + 1}"
+        holder.dragButton.contentDescription = "드래그 버튼 ${position + 1}"
     }
 
     override fun getItemCount(): Int {
