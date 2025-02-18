@@ -21,11 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:autofillHints=""
         android:inputType="textMultiLine"
         android:textSize="16sp"
         android:background="@null"
         android:gravity="top|start"
-        android:contentDescription="메모 입력 필드"
+        android:importantForAccessibility="no"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"/>
 

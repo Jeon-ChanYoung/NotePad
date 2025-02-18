@@ -1,8 +1,10 @@
 package com.chanyoung.notepad
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowInsetsController
@@ -42,7 +44,10 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true) // 뒤로가기 버튼 활성화
+        supportActionBar?.apply {
+            title = ""
+            setDisplayHomeAsUpEnabled(true)
+        }
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.purple)) // 상태바 색상 설정
         window.setNavigationBarColor(ContextCompat.getColor(this, R.color.brightPurple)) // 네비게이션 바 색상 설정
 
@@ -97,6 +102,16 @@ class NoteActivity : AppCompatActivity() {
                 overridePendingTransition(0, 0) // 화면 전환시 애니매이션 제거
                 true
             }
+
+            R.id.copy -> {
+                copyMemoToClipboard()
+                true
+            }
+
+            R.id.share -> {
+                shareNote()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -139,7 +154,6 @@ class NoteActivity : AppCompatActivity() {
         // 변경사항 없으면 패스
         if (title == titleEditTextOriginal && content == memoEditTextOriginal) {
             setResult(RESULT_CANCELED)
-            finish()
             return
         }
 
@@ -170,5 +184,32 @@ class NoteActivity : AppCompatActivity() {
             putExtra("itemId", itemId)
             setResult(RESULT_OK, this)
         }
+    }
+
+    private fun copyMemoToClipboard() {
+        val content = memoEditText.text.toString()
+
+        if (content.isEmpty()) {
+            Toast.makeText(this, "복사할 메모가 없습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = android.content.ClipData.newPlainText("메모", content)
+        clipboard.setPrimaryClip(clip)
+    }
+
+    private fun shareNote() {
+        val content = memoEditText.text.toString()
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, content)
+        }
+        startActivity(Intent.createChooser(shareIntent, "메모 공유"))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.note_activity_menu_bar, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 }
