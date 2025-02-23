@@ -28,7 +28,10 @@
         android:gravity="top|start"
         android:importantForAccessibility="no"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginRight="16dp"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@drawable/custom_scrollbar"
+        android:fadeScrollbars="false"/>
 
     <!-- 광고 배너 -->
     <com.google.android.gms.ads.AdView
