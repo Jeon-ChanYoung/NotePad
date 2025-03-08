@@ -2,8 +2,29 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="brightLightPurple">#FFF5EFFF</color>>
-    <color name="brightPurple">#FFE5D9F2</color>
-    <color name="lightPurple">#FFCDC1FF</color>
-    <color name="purple">#FFA294F9</color>
+
+    <color name="brightPurple">#E5D9F2</color>
+    <color name="lightPurple">#CDC1FF</color>
+    <color name="purple">#A294F9</color>
+
+    <color name="brightRed">#FABABA</color>
+    <color name="lightRed">#FD8E8E</color>
+    <color name="red">#F46767</color>
+
+    <color name="brightGreen">#C2FABF</color>
+    <color name="lightGreen">#8FD9A8</color>
+    <color name="green">#57A957</color>
+
+    <color name="brightBlue">#C0E6FF</color>
+    <color name="lightBlue">#8ACFFD</color>
+    <color name="blue">#36AEFB</color>
+
+    <color name="brightGray">#D9D9D9</color>
+    <color name="lightGray">#B3B3B3</color>
+    <color name="gray">#6E6E6E</color>
+
+    <color name="brightOrange">#FFD493</color>
+    <color name="lightOrange">#FAAA5C</color>
+    <color name="orange">#FF8322</color>
+
 </resources>

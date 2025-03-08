@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 class CustomAdapter(
     private val context: Context,
     private val titles: ArrayList<String>,
+    private var isDeleteButtonHidden: Boolean,
     private val onDelete: (position: Int) -> Unit,
     private val onClick: (position: Int) -> Unit,
     private val itemTouchHelper: ItemTouchHelper
@@ -68,6 +69,9 @@ class CustomAdapter(
         val title = titles[position]
         holder.titleTextView.text = title
 
+        // 삭제 버튼의 가시성 설정
+        holder.deleteButton.visibility = if (isDeleteButtonHidden) View.GONE else View.VISIBLE
+
         // 각 항목에 대한 고유한 contentDescription 설정
         holder.titleTextView.contentDescription = "메모 항목 ${position + 1}"
         holder.deleteButton.contentDescription = "삭제 버튼 ${position + 1}"
@@ -76,5 +80,10 @@ class CustomAdapter(
 
     override fun getItemCount(): Int {
         return titles.size
+    }
+
+    fun updateDeleteButtonVisibility(isVisible: Boolean) {
+        isDeleteButtonHidden = isVisible
+        notifyDataSetChanged()
     }
 }

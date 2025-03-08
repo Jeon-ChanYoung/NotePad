@@ -3,6 +3,8 @@ package com.chanyoung.notepad
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -10,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -25,6 +26,9 @@ import com.google.gson.reflect.TypeToken
 import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
+    
+    private lateinit var themeManager: ThemeManager
+    
     private lateinit var memoTitles: ArrayList<String>
     private lateinit var memoContent: ArrayList<String>
     private lateinit var memoItemId: ArrayList<String>
@@ -37,12 +41,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var constraintLayout: ConstraintLayout
     private lateinit var constraintSet: ConstraintSet
 
+    private var isAddMemoLocationBotton: Boolean = false
+
     private val itemTouchHelper by lazy {
         ItemTouchHelper(itemTouchCallback)
     }
 
     companion object {
         const val SHARED_PREFS_NAME = "NotePadPrefs"
+        const val SHARED_PREFS_UI = "NotePadUI"
         const val UNIQUE_ID_KEY = "uniqueId"
     }
 
@@ -50,34 +57,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // UI 설정
-        setupUI()
 
-        // 뷰 초기화
-        initializeViews()
-
-        // 메모 데이터 로드
-        loadMemoData()
-
-        // 리스트뷰 설정
-        setupRecyclerView()
-
-        // + 버튼 설정
-        setupAddMemoButton()
-
-        // 광고 초기화
-        initializeAdMob()
+        initializeViews() // 뷰 초기화
+        loadMemoData() // 메모 데이터 로드
+        setupRecyclerView() // 리스트뷰 설정
+        setupAddMemoButton() // + 버튼 설정
+        initializeAdMob() // 광고 초기화
+        setupUI()  // UI 설정
     }
 
     // activity_main 초기 UI 설정
     private fun setupUI() {
         enableEdgeToEdge()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) // 다크모드 x
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.purple)) // 상태바 색상 설정
-        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.brightPurple)) // 네비게이션 바 색상 설정
+        themeManager = ThemeManager(this)
+        themeManager.applyThemeColors()
+        themeManager.changeAddButtonColor(addButton)
 
         val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
         windowInsetsController.isAppearanceLightStatusBars = false // 상태바 위젯 색상 하얀색으로 설정
+
+        updateAddMemoLocation()
     }
 
     private fun initializeAdMob() {
@@ -118,9 +118,13 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setupRecyclerView() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS_UI, MODE_PRIVATE)
+        val isButtonHidden = sharedPreferences.getBoolean("isButtonHidden", false)
+
         customAdapter = CustomAdapter(
             this,
             memoTitles,
+            !isButtonHidden,
             ::deleteMemo,
             ::openMemoForEditing,
             itemTouchHelper
@@ -142,15 +146,21 @@ class MainActivity : AppCompatActivity() {
             val newTitle = "제목없음"
             val newMemo = ""
             val newId = UUID.randomUUID().toString() // 고유한 ID 생성
-            memoTitles.add(0, newTitle)
-            memoContent.add(0, newMemo)
-            memoItemId.add(0, newId)
 
+            if (isAddMemoLocationBotton) {
+                memoTitles.add(newTitle)
+                memoContent.add(newMemo)
+                memoItemId.add(newId)
+                customAdapter.notifyItemInserted(memoTitles.size - 1)
+                recyclerView.scrollToPosition(memoTitles.size - 1)
+            } else {
+                memoTitles.add(0, newTitle)
+                memoContent.add(0, newMemo)
+                memoItemId.add(0, newId)
+                customAdapter.notifyItemInserted(0)
+                recyclerView.scrollToPosition(0)
+            }
             saveData(newTitle, newMemo, newId)
-            customAdapter.notifyItemInserted(0)
-
-            // 스크롤 맨 위로 이동
-            recyclerView.scrollToPosition(0)
         }
     }
 
@@ -167,6 +177,7 @@ class MainActivity : AppCompatActivity() {
             putExtra("title", memoTitles[position])
             putExtra("content", memoContent[position])
             putExtra("itemId", memoItemId[position])
+            putExtra("position", position)
         }
         startActivityForResult(intent, 1)
         overridePendingTransition(0, 0)
@@ -233,22 +244,38 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            val title = data?.getStringExtra("title") ?: ""
-            val content = data?.getStringExtra("content") ?: ""
-            val itemId = data?.getStringExtra("itemId") ?: ""
-
+            val itemId = data?.getStringExtra("itemId") ?: return
             val index = memoItemId.indexOf(itemId)
+
             if (index == -1) {
                 Log.e("test", "Error: itemId not found in memoItemId. itemId: $itemId")
                 return
             }
 
-            memoTitles[index] = title
-            memoContent[index] = content
-            saveData(title, content, itemId)
-            customAdapter.notifyItemChanged(index)
+            if (data.getBooleanExtra("delete", false)) {
+                // 메모 삭제 처리
+                memoTitles.removeAt(index)
+                memoContent.removeAt(index)
+                memoItemId.removeAt(index)
+                customAdapter.notifyItemRemoved(index)
+            } else {
+                // 메모 수정 처리
+                val title = data.getStringExtra("title") ?: ""
+                val content = data.getStringExtra("content") ?: ""
+
+                memoTitles[index] = title
+                memoContent[index] = content
+                saveData(title, content, itemId)
+                customAdapter.notifyItemChanged(index)
+            }
         }
     }
+
+    private fun updateAddMemoLocation() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS_UI, MODE_PRIVATE)
+        isAddMemoLocationBotton = sharedPreferences.getBoolean("isAddMemoLocationBotton", false)
+    }
+
 
     private val itemTouchCallback = object : ItemTouchHelper.Callback() {
 
@@ -307,10 +334,33 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         adView.resume()
+        themeManager.applyThemeColors()
+        themeManager.changeAddButtonColor(addButton)
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS_UI, MODE_PRIVATE)
+        val isDeleteButtonVisible = sharedPreferences.getBoolean("isButtonHidden", false)
+        customAdapter.updateDeleteButtonVisibility(isDeleteButtonVisible)
+        updateAddMemoLocation()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         adView.destroy()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.setting -> {
+                val intent = Intent(this, SettingActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(0, 0)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_activity_menu_bar, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 }

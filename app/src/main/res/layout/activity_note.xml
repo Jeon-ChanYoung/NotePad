@@ -33,7 +33,6 @@
         android:scrollbarThumbVertical="@drawable/custom_scrollbar"
         android:fadeScrollbars="false"/>
 
-    <!-- 광고 배너 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"

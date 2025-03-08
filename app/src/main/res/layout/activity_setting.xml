@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="테마 설정"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_margin="14dp"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnRed"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:background="@drawable/selector_rectangle_red" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnOrange"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:background="@drawable/selector_rectangle_orange" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnGreen"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:background="@drawable/selector_rectangle_green" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnBlue"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:background="@drawable/selector_rectangle_blue" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnPurple"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:checked="true"
+                android:background="@drawable/selector_rectangle_purple"/>
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+            <RadioButton
+                android:id="@+id/btnGray"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:button="@null"
+                android:background="@drawable/selector_rectangle_gray" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="삭제 버튼 숨기기"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_weight="1"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_hide_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:elevation="4dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="메모 맨 아래에서부터 추가"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_weight="1"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_location_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:elevation="4dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="10dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:adSize="BANNER"
+        app:adUnitId="@string/admob_banner_id" />
+
+</LinearLayout>

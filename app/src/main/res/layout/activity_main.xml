@@ -27,7 +27,6 @@
         android:layout_height="64dp"
         android:layout_margin="20dp"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="@color/lightPurple"
         android:contentDescription="새 메모 추가"
         android:scaleType="fitCenter"
         android:src="@drawable/plus"

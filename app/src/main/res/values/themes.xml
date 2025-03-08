@@ -3,8 +3,6 @@
     <style name="Base.Theme.NotePad" parent="Theme.MaterialComponents.Light">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/lightPurple</item>
-        <item name="colorControlActivated">@color/lightPurple</item> <!-- 포커스된 밑줄 색상 -->
-        <item name="android:textColorHighlight">@color/lightPurple</item> <!-- 드래그 영역 색상 -->
 
     </style>
 

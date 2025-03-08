@@ -1,15 +1,14 @@
 package com.chanyoung.notepad
 
+import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.WindowInsetsController
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.AdRequest
@@ -19,6 +18,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class NoteActivity : AppCompatActivity() {
+
+    private lateinit var themeManager: ThemeManager
+
     private lateinit var titleEditText: EditText
     private lateinit var memoEditText: EditText
     private lateinit var titleEditTextOriginal: String
@@ -27,6 +29,7 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var title: String
     private lateinit var content: String
     private lateinit var itemId: String
+    private var position: Int = -1
 
     private lateinit var adView: AdView
 
@@ -36,11 +39,11 @@ class NoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
 
-        setupUI() // 초기 UI 설정
         initializeAdMob() // 하단 광고 배너 설정
         initializeViews() // 제목EditText, 메모EditText 찾기
         loadIntentData() // 이전 화면에서 전달받은 데이터 로드
         setInitialData() // 이전 화면에서 전달받은 데이터로 제목EditText, 메모EditText 초기화
+        setupUI() // 초기 UI 설정
     }
 
     private fun setupUI() {
@@ -48,17 +51,9 @@ class NoteActivity : AppCompatActivity() {
             title = ""
             setDisplayHomeAsUpEnabled(true)
         }
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.purple)) // 상태바 색상 설정
-        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.brightPurple)) // 네비게이션 바 색상 설정
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS, // 밝은 배경에 어두운 텍스트
-                WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
-            )
-        } else {
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        }
+        themeManager = ThemeManager(this)
+        themeManager.applyThemeColors()
+        themeManager.changeFocusColor(titleEditText, memoEditText)
     }
 
     private fun initializeAdMob() {
@@ -81,6 +76,7 @@ class NoteActivity : AppCompatActivity() {
         title = intent.getStringExtra("title") ?: ""
         content = intent.getStringExtra("content") ?: ""
         itemId = intent.getStringExtra("itemId") ?: ""
+        position = intent.getIntExtra("position", -1)
     }
 
     private fun setInitialData() {
@@ -100,6 +96,11 @@ class NoteActivity : AppCompatActivity() {
                 saveNoteToPrefs() // 메모 저장
                 finish() // 현재 액티비티 종료
                 overridePendingTransition(0, 0) // 화면 전환시 애니매이션 제거
+                true
+            }
+
+            R.id.delete -> {
+                showDeleteDialog()
                 true
             }
 
@@ -184,6 +185,33 @@ class NoteActivity : AppCompatActivity() {
             putExtra("itemId", itemId)
             setResult(RESULT_OK, this)
         }
+    }
+
+    private fun showDeleteDialog() {
+        val alertDialog = AlertDialog.Builder(this)
+            .setTitle("삭제")
+            .setMessage("이 메모를 삭제하겠습니까?")
+            .setPositiveButton("네") { _, _ -> deleteNote() }
+            .setNegativeButton("아니요", null)
+            .create()
+
+        alertDialog.show()
+
+        // 다이얼로그 버튼 색상 변경
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            .setTextColor(ContextCompat.getColor(this, R.color.black))
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            .setTextColor(ContextCompat.getColor(this, R.color.black))
+    }
+
+    private fun deleteNote() {
+        val resultIntent = Intent().apply {
+            putExtra("itemId", itemId)
+            putExtra("delete", true)
+            putExtra("position", position)
+        }
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 
     private fun copyMemoToClipboard() {
