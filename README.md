@@ -1,4 +1,5 @@
 # NotePad - 메모장
+[![Google Play](https://img.shields.io/badge/Google%20Play-Download-green?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.chanyoung.notepad)
 
 이 앱은 Android Studio를 이용해 개발한 간단한 메모장 앱으로, 사용자가 메모를 작성하고, 수정하고, 삭제할 수 있는 기능을 제공함. 직관적인 사용자 인터페이스로 편리하게 메모를 관리할 수 있음.
 <br>
@@ -10,9 +11,6 @@
 - **Gradle**: 8.9
 - **kotlin**: 1.9.24
 
-## 모바일에서 실행 방법
-- Releases에 있는 임의의 버전 apk 다운 받아서 휴대폰에 전송하여 다운로드 및 실행
-
 ## 기능
 
 앱은 다음과 같은 기능들을 제공함:
@@ -22,6 +20,9 @@
 - **메모 삭제** : 메모를 삭제할 수 있음.
 - **메모 드래그** : 메모를 위 아래로 움직여 원하는 자리에 배치할 수 있음.
 - **메모 저장** : 변경 내용을 자동으로 저장함.
+
+## 🛠 기술 스택
+Kotlin (Android Native)
 
 ## Preview
 <br>
